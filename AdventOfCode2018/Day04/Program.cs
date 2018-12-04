@@ -15,7 +15,6 @@ namespace Day04
             var guards = CalcGuardsSleep(source);
 
             var selectedGuardByStrategyOne = guards.OrderByDescending(g => g.MinutesAsleep.Count).First();
-
             int mostFrequentMinute = GetMostFrequentSleepMinute(selectedGuardByStrategyOne).Minute;
 
             var part1 = selectedGuardByStrategyOne.Id * mostFrequentMinute;
@@ -39,13 +38,14 @@ namespace Day04
             var chronologicalLog = log.OrderBy(c => c).ToList();
             int currentGuardId = 0;
             int currentSleepStart = 0;
-            Regex minutesRegex = new Regex(@"^\S{11}\s\S{3}(?<Minutes>\d{2})");
+            Regex guardIdRegex = new Regex(@"^.{19}Guard.{2}(?<Id>\d+)");
+            Regex minutesRegex = new Regex(@"^.{15}(?<Minutes>\d{2})");
 
             foreach (var entry in chronologicalLog)
             {
                 if (entry.Contains("Guard"))
                 {
-                    currentGuardId = int.Parse(entry.Split("#")[1].Split(" begins")[0]);
+                    currentGuardId = int.Parse(guardIdRegex.Match(entry).Groups["Id"].Value);
                     if (guards.All(g => g.Id != currentGuardId))
                     {
                         guards.Add(new Guard(currentGuardId));
