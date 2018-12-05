@@ -10,14 +10,17 @@ namespace Day05
         {
             var sourcePolymer = File.ReadAllText(@"..\..\..\input.txt").Trim();
 
-            var sourcePolymerAfterReaction = PerformReaction(sourcePolymer);
+            var sourcePolymerAfterReaction = PerformReaction(new StringBuilder(sourcePolymer));
 
             Console.WriteLine($"Part1: {sourcePolymerAfterReaction.Length}");
 
             int shortestPolymerLength = int.MaxValue;
             for (int i = 65; i <= 90; i++)
             {
-                var polymer = sourcePolymer.Replace(((char)i).ToString(), "").Replace(((char)(i + 32)).ToString(), "");
+                var polymer = new StringBuilder(sourcePolymerAfterReaction);
+                polymer.Replace(((char)i).ToString(), "");
+                polymer.Replace(((char)(i + 32)).ToString(), "");
+
                 var polymerAfterReaction = PerformReaction(polymer);
 
                 if (polymerAfterReaction.Length < shortestPolymerLength)
@@ -31,7 +34,7 @@ namespace Day05
             Console.ReadKey();
         }
 
-        private static string PerformReaction(string polymer)
+        private static string PerformReaction(StringBuilder polymer)
         {
             bool reacted = true;
             while (reacted)
@@ -48,13 +51,13 @@ namespace Day05
                     }
 
                     reacted = true;
-                    polymer = new StringBuilder(polymer).Remove(index, 2).ToString();
+                    polymer.Remove(index, 2);
 
                     break;
                 }
             }
 
-            return polymer;
+            return polymer.ToString();
         }
     }
 }
