@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.IO;
 using System.Linq;
 
@@ -14,11 +13,11 @@ namespace Day03
 
             //source = new[] {"#1 @ 1,3: 4x4", "#2 @ 3,1: 4x4", "#3 @ 5,5: 2x2"}; // Sample data
 
-            var claims = source.Select(c => new MaterialClaim(c)).ToList();
+            var claims = new HashSet<MaterialClaim>(source.Select(c => new MaterialClaim(c)));
             var allPoints = claims.SelectMany(c => c.Points).ToList();
 
-            HashSet<Point> seenPoints = new HashSet<Point>();
-            HashSet<Point> overlappingPoints = new HashSet<Point>();
+            HashSet<(int X, int Y)> seenPoints = new HashSet<(int X, int Y)>();
+            HashSet<(int X, int Y)> overlappingPoints = new HashSet<(int X, int Y)>();
 
             foreach (var point in allPoints)
             {

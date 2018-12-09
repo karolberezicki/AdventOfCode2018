@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Drawing;
 using System.Text.RegularExpressions;
 
 namespace Day03
@@ -18,7 +17,7 @@ namespace Day03
 
         public string Display => $"#{Id} @ {Left},{Top}: {Width}x{Height}";
 
-        public List<Point> Points { get; set; } 
+        public HashSet<(int X, int Y)> Points { get; set; }
 
         public MaterialClaim(string description)
         {
@@ -28,16 +27,14 @@ namespace Day03
             Top = int.Parse(match.Groups[nameof(Top)].Value);
             Width = int.Parse(match.Groups[nameof(Width)].Value);
             Height = int.Parse(match.Groups[nameof(Height)].Value);
-            Points = new List<Point>();
+            Points = new HashSet<(int X, int Y)>();
             for (int x = Left; x < Left + Width; x++)
             {
                 for (int y = Top; y < Top + Height; y++)
                 {
-                    Points.Add(new Point(x,y));
+                    Points.Add((x, y));
                 }
             }
-
-
         }
     }
 }
