@@ -21,49 +21,30 @@ namespace Day09
 
         private static long CalculateHighScore((int Players, int LastMarbleWorth) game)
         {
-            List<List<long>> elfScores = Enumerable.Range(0, game.Players).Select(p => new List<long>()).ToList();
+            var elfScores = Enumerable.Range(0, game.Players).Select(p => new List<long>()).ToList();
+            var marbleCircle = new LinkedList<int>(new []{0});
+            var currentMarble = marbleCircle.First;
 
-            LinkedList<int> marbleCircle = new LinkedList<int>();
-            marbleCircle.AddFirst(new LinkedListNode<int>(0));
-            int pickedMarble = 0;
-            int currentElf = 0;
-
-            LinkedListNode<int> currentMarble = marbleCircle.First;
-
-            while (pickedMarble <= game.LastMarbleWorth)
+            for (int pickedMarble = 1; pickedMarble < game.LastMarbleWorth; pickedMarble++)
             {
-                pickedMarble++;
                 if (pickedMarble % 23 == 0)
                 {
-                    currentMarble = StepBack(marbleCircle, currentMarble, 7);
-                    elfScores[currentElf].AddRange(new long[] { pickedMarble, currentMarble.Value });
-
-                    var nextMarble = currentMarble.Next ?? marbleCircle.First;
+                    currentMarble = currentMarble.CircleBackward(marbleCircle, 7);
+                    elfScores[(pickedMarble - 1) % game.Players].AddRange(new long[] { pickedMarble, currentMarble.Value });
+                    var nextMarble = currentMarble.CircleForward(marbleCircle);
                     marbleCircle.Remove(currentMarble);
                     currentMarble = nextMarble;
                 }
                 else
                 {
-                    currentMarble = currentMarble.Next ?? marbleCircle.First;
+                    currentMarble = currentMarble.CircleForward(marbleCircle);
                     var addedMarble = new LinkedListNode<int>(pickedMarble);
                     marbleCircle.AddAfter(currentMarble, addedMarble);
                     currentMarble = addedMarble;
                 }
-
-                currentElf = ++currentElf % game.Players;
             }
 
             return elfScores.Select(s => s.Sum()).Max();
-        }
-
-        private static LinkedListNode<int> StepBack(LinkedList<int> list, LinkedListNode<int> node, int times)
-        {
-            for (int i = 0; i < times; i++)
-            {
-                node = node.Previous ?? list.Last;
-            }
-
-            return node;
         }
 
         private static (int Players, int LastMarbleWorth) GetGameData(int scoreMultiplier = 1)
