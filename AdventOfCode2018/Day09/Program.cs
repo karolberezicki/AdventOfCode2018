@@ -10,74 +10,68 @@ namespace Day09
     {
         public static void Main()
         {
-            var game = GetGameData();
+            long part1 = CalculateHighScore(GetGameData());
+            Console.WriteLine($"Part1: {part1}");
 
-            int highScore = CalculateHighScore(game);
-            Console.WriteLine(highScore);
-
-            int highScorePart2 = CalculateHighScore((game.Players, game.LastMarbleWorth*100));
-            Console.WriteLine(highScorePart2);
+            long part2 = CalculateHighScore(GetGameData(100));
+            Console.WriteLine($"Part1: {part2}");
 
             Console.ReadKey();
         }
 
-        private static int CalculateHighScore((int Players, int LastMarbleWorth) game)
+        private static long CalculateHighScore((int Players, int LastMarbleWorth) game)
         {
-            List<List<int>> elfScores = new List<List<int>>();
-            for (int i = 0; i < game.Players; i++)
-            {
-                elfScores.Add(new List<int>());
-            }
+            List<List<long>> elfScores = Enumerable.Range(0, game.Players).Select(p => new List<long>()).ToList();
 
-            List<int> marbleCircle = new List<int> { 0 };
-            int pickedMarble = 1;
-
+            LinkedList<int> marbleCircle = new LinkedList<int>();
+            marbleCircle.AddFirst(new LinkedListNode<int>(0));
+            int pickedMarble = 0;
             int currentElf = 0;
-            int currentMarbleIndex = 0;
+
+            LinkedListNode<int> currentMarble = marbleCircle.First;
 
             while (pickedMarble <= game.LastMarbleWorth)
             {
-
+                pickedMarble++;
                 if (pickedMarble % 23 == 0)
                 {
-                    currentMarbleIndex = currentMarbleIndex - 7;
-                    currentMarbleIndex = currentMarbleIndex >= 0
-                        ? currentMarbleIndex
-                        : marbleCircle.Count + currentMarbleIndex;
-                    var value = marbleCircle[currentMarbleIndex];
-                    marbleCircle.RemoveAt(currentMarbleIndex);
-                    elfScores[currentElf].Add(pickedMarble);
-                    elfScores[currentElf].Add(value);
+                    currentMarble = StepBack(marbleCircle, currentMarble, 7);
+                    elfScores[currentElf].AddRange(new long[] { pickedMarble, currentMarble.Value });
+
+                    var nextMarble = currentMarble.Next ?? marbleCircle.First;
+                    marbleCircle.Remove(currentMarble);
+                    currentMarble = nextMarble;
                 }
                 else
                 {
-                    currentMarbleIndex += 1;
-                    currentMarbleIndex = currentMarbleIndex % marbleCircle.Count;
-                    currentMarbleIndex++;
-                    marbleCircle.Insert(currentMarbleIndex, pickedMarble);
-
+                    currentMarble = currentMarble.Next ?? marbleCircle.First;
+                    var addedMarble = new LinkedListNode<int>(pickedMarble);
+                    marbleCircle.AddAfter(currentMarble, addedMarble);
+                    currentMarble = addedMarble;
                 }
 
-                pickedMarble++;
-                currentElf++;
-                currentElf = currentElf % game.Players;
-
-                if (pickedMarble % 10000 == 0)
-                {
-                    Console.WriteLine($"Current picked marble {pickedMarble}");
-                }
+                currentElf = ++currentElf % game.Players;
             }
 
-            var highScore = elfScores.Select(s => s.Sum()).Max();
-            return highScore;
+            return elfScores.Select(s => s.Sum()).Max();
         }
 
-        private static (int Players, int LastMarbleWorth) GetGameData()
+        private static LinkedListNode<int> StepBack(LinkedList<int> list, LinkedListNode<int> node, int times)
+        {
+            for (int i = 0; i < times; i++)
+            {
+                node = node.Previous ?? list.Last;
+            }
+
+            return node;
+        }
+
+        private static (int Players, int LastMarbleWorth) GetGameData(int scoreMultiplier = 1)
         {
             var source = File.ReadAllText(@"..\..\..\input.txt");
             var descriptionRegex = new Regex(@"(?<Players>\d+) players; last marble is worth (?<Points>\d+) points");
             Match match = descriptionRegex.Match(source);
-            return (int.Parse(match.Groups["Players"].Value), int.Parse(match.Groups["Points"].Value));
+            return (int.Parse(match.Groups["Players"].Value), int.Parse(match.Groups["Points"].Value)*scoreMultiplier);
         }
     }
 }
