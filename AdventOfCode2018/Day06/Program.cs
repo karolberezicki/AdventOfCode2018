@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.IO;
 using System.Linq;
 
@@ -14,7 +13,7 @@ namespace Day06
 
             var coordinates = source
                 .Select(coordinate => coordinate.Split(", "))
-                .Select(coordinate => new Point(int.Parse(coordinate[0]), int.Parse(coordinate[1])))
+                .Select(coordinate => (X: int.Parse(coordinate[0]), Y: int.Parse(coordinate[1])))
                 .ToList();
 
             int planeSize = coordinates.Select(p => p.X).Union(coordinates.Select(p => p.X)).Max() + 1;
@@ -25,7 +24,7 @@ namespace Day06
 
             for (int index = 0; index < coordinates.Count; index++)
             {
-                Point point = coordinates[index];
+                var point = coordinates[index];
                 matrix[point.X, point.Y] = index;
                 closestDistanceMatrix[point.X, point.Y] = 0;
             }
@@ -36,7 +35,7 @@ namespace Day06
                 {
                     for (int id = 0; id < coordinates.Count; id++)
                     {
-                        Point point = coordinates[id];
+                        var point = coordinates[id];
 
                         if (closestDistanceMatrix[x, y] == 0)
                         {
@@ -80,7 +79,7 @@ namespace Day06
             {
                 for (int y = 0; y < planeSize; y++)
                 {
-                    foreach (Point point in coordinates)
+                    foreach (var point in coordinates)
                     {
                         var distance = Math.Abs(point.X - x) + Math.Abs(point.Y - y);
 
