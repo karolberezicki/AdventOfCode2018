@@ -70,13 +70,13 @@ namespace Day14
                     digitsIndex++;
                 }
 
-                if (!part1Resolved && !part2Resolved)
+                if (part1Resolved && part2Resolved)
                 {
                     break;
                 }
             }
 
-            //Console.ReadKey();
+            Console.ReadKey();
         }
 
         private static void Display(List<int> recipes, int firstElf, int secondElf)
